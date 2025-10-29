@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0">
+    <title>百度贴吧 - 前端效果图设计</title>
+    <style>
+        /* 重置样式和基础设置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        @media (max-width: 768px) {
+            html {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            html {
+                font-size: 12px;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* CSS变量定义 */
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --success-color: #34C759;
+            --warning-color: #FF9500;
+            --error-color: #FF3B30;
+            --text-primary: #000000;
+            --text-secondary: #8E8E93;
+            --background-primary: #FFFFFF;
+            --background-secondary: #F2F2F7;
+            --border-color: #C6C6C8;
+            --shadow-light: rgba(0, 0, 0, 0.1);
+            --shadow-medium: rgba(0, 0, 0, 0.2);
+            --shadow-heavy: rgba(0, 0, 0, 0.3);
+            --border-radius-small: 8px;
+            --border-radius-medium: 12px;
+            --border-radius-large: 16px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        /* 通用容器 */
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 2rem);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+                padding: 0 1rem;
+            }
+        }
+
+        /* 页面切换导航 */
+        .page-nav {
+            background: var(--background-primary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-nav-container {
+            display: flex;
+            overflow-x: auto;
+            padding: var(--spacing-md);
+            gap: var(--spacing-md);
+        }
+
+        .page-nav-btn {
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--background-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-medium);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .page-nav-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* 页面内容区域 */
+        .page-content {
+            display: none;
+            padding: var(--spacing-lg) 0;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        /* 通用卡片样式 */
+        .card {
+            background: var(--background-primary);
+            border-radius: var(--border-radius-medium);
+            box-shadow: 0 2px 8px var(--shadow-light);
+            margin-bottom: var(--spacing-md);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--shadow-medium);
+        }
+
+        .card-header {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: var(--spacing-md);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: none;
+            border-radius: var(--border-radius-small);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            white-space: nowrap;
+            min-height: 44px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--background-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-sm {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            font-size: 0.75rem;
+            min-height: 32px;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            background: var(--background-primary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md) var(--spacing-lg);
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 var(--spacing-md);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-medium);
+            font-size: 0.875rem;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--background-primary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: var(--spacing-sm) 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+            margin-bottom: 2px;
+        }
+
+        /* 轮播图样式 */
+        .carousel {
+            position: relative;
+            border-radius: var(--border-radius-medium);
+            overflow: hidden;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .carousel-slide {
+            display: none;
+            position: relative;
+        }
+
+        .carousel-slide.active {
+            display: block;
+        }
+
+        .carousel-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .carousel-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: var(--spacing-md);
+        }
+
+        /* 贴吧列表样式 */
+        .tieba-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .tieba-card {
+            background: var(--background-primary);
+            border-radius: var(--border-radius-medium);
+            padding: var(--spacing-md);
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s ease;
+        }
+
+        .tieba-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .tieba-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto var(--spacing-sm);
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* 帖子列表样式 */
+        .post-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .post-card {
+            background: var(--background-primary);
+            border-radius: var(--border-radius-medium);
+            padding: var(--spacing-md);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            margin-right: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .post-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .post-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .post-content {
+            margin-bottom: var(--spacing-sm);
+            line-height: 1.5;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        /* 用户信息样式 */
+        .user-profile {
+            text-align: center;
+            padding: var(--spacing-lg);
+            background: var(--background-primary);
+            border-radius: var(--border-radius-medium);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            margin: 0 auto var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .user-stats {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-xl);
+            margin: var(--spacing-md) 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* 功能网格 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .feature-item {
+            background: var(--background-primary);
+            border-radius: var(--border-radius-medium);
+            padding: var(--spacing-md);
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-sm);
+            color: var(--primary-color);
+        }
+
+        /* 消息列表样式 */
+        .message-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .message-item {
+            background: var(--background-primary);
+            border-radius: var(--border-radius-medium);
+            padding: var(--spacing-md);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .message-sender {
+            font-weight: 600;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .message-text {
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .tieba-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .nav-container {
+                padding: var(--spacing-sm);
+            }
+            
+            .search-box {
+                max-width: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tieba-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-stats {
+                gap: var(--spacing-md);
+            }
+        }
+
+        /* 页面特定样式 */
+        .page-home {
+            padding-bottom: 80px; /* 为底部导航留出空间 */
+        }
+
+        .page-tieba {
+            padding-bottom: 80px;
+        }
+
+        .page-message {
+            padding-bottom: 80px;
+        }
+
+        .page-profile {
+            padding-bottom: 80px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面切换导航 -->
+    <div class="page-nav">
+        <div class="container">
+            <div class="page-nav-container">
+                <button class="page-nav-btn active" onclick="showPage('home')">首页</button>
+                <button class="page-nav-btn" onclick="showPage('tieba')">贴吧详情</button>
+                <button class="page-nav-btn" onclick="showPage('post')">帖子详情</button>
+                <button class="page-nav-btn" onclick="showPage('message')">消息中心</button>
+                <button class="page-nav-btn" onclick="showPage('profile')">个人中心</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 首页 -->
+    <div id="page-home" class="page-content active">
+        <div class="container">
+            <!-- 导航栏 -->
+            <div class="navbar">
+                <div class="nav-container">
+                    <a href="#" class="logo">百度贴吧</a>
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="搜索贴吧、帖子、用户...">
+                    </div>
+                    <div class="nav-actions">
+                        <button class="btn btn-secondary btn-sm">消息</button>
+                        <button class="btn btn-primary btn-sm">登录</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 轮播图 -->
+            <div class="carousel">
+                <div class="carousel-slide active">
+                    <div class="carousel-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                    <div class="carousel-caption">
+                        <h3>热门活动</h3>
+                        <p>参与贴吧活动，赢取丰厚奖励</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 热门贴吧 -->
+            <div class="card">
+                <div class="card-header">热门贴吧</div>
+                <div class="card-body">
+                    <div class="tieba-grid">
+                        <a href="#" class="tieba-card">
+                            <div class="tieba-avatar">LOL</div>
+                            <div>英雄联盟</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">120万成员</div>
+                        </a>
+                        <a href="#" class="tieba-card">
+                            <div class="tieba-avatar">NBA</div>
+                            <div>NBA</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">80万成员</div>
+                        </a>
+                        <a href="#" class="tieba-card">
+                            <div class="tieba-avatar">IT</div>
+                            <div>程序员</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">50万成员</div>
+                        </a>
+                        <a href="#" class="tieba-card">
+                            <div class="tieba-avatar">美食</div>
+                            <div>美食吧</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">30万成员</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 推荐帖子 -->
+            <div class="card">
+                <div class="card-header">推荐帖子</div>
+                <div class="card-body">
+                    <div class="post-list">
+                        <div class="post-card">
+                            <div class="post-header">
+                                <div class="post-avatar">张</div>
+                                <div class="post-info">
+                                    <div class="post-title">【讨论】最新版本英雄强度分析</div>
+                                    <div class="post-meta">英雄联盟吧 · 2小时前 · 256回复</div>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                新版本更新后，各个英雄的强度发生了很大变化，大家觉得哪些英雄现在比较强势？
+                            </div>
+                            <div class="post-actions">
+                                <div class="action-btn">👍 128</div>
+                                <div class="action-btn">💬 256</div>
+                                <div class="action-btn">⭐ 收藏</div>
+                            </div>
+                        </div>
+
+                        <div class="post-card">
+                            <div class="post-header">
+                                <div class="post-avatar">李</div>
+                                <div class="post-info">
+                                    <div class="post-title">【分享】今日美食制作过程</div>
+                                    <div class="post-meta">美食吧 · 5小时前 · 89回复</div>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                今天尝试做了一道红烧肉，分享一下制作过程和成品照片，欢迎大家交流厨艺心得。
+                            </div>
+                            <div class="post-actions">
+                                <div class="action-btn">👍 56</div>
+                                <div class="action-btn">💬 89</div>
+                                <div class="action-btn">⭐ 收藏</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <div class="nav-icon">🏠</div>
+                <div>首页</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">👥</div>
+                <div>贴吧</div>
+            </a>
+#" class="nav-item">
+                <div class="nav-icon">✉️</div>
+                <div>消息</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div>我的</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 消息中心页 -->
+    <div id="page-message" class="page-content">
+        <div class="container">
+            <!-- 消息分类导航 -->
+            <div class="card">
+                <div class="card-body" style="display: flex; gap: var(--spacing-md); overflow-x: auto;">
+                    <button class="btn btn-primary btn-sm">全部</button>
+                    <button class="btn btn-secondary btn-sm">私信</button>
+                    <button class="btn btn-secondary btn-sm">回复</button>
+                    <button class="btn btn-secondary btn-sm">@我</button>
+                    <button class="btn btn-secondary btn-sm">系统</button>
+                </div>
+            </div>
+
+            <!-- 消息列表 -->
+            <div class="message-list">
+                <div class="message-item">
+                    <div class="message-avatar">张</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">张三</span>
+                            <span class="message-time">2小时前</span>
+                        </div>
+                        <div class="message-text">
+                            你好，看了你的帖子很有收获，能加个好友交流一下吗？
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message-item">
+                    <div class="message-avatar">李</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">李四</span>
+                            <span class="message-time">5小时前</span>
+                        </div>
+                        <div class="message-text">
+                            你的评论很有道理，我也有类似的想法。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message-item">
+                    <div class="message-avatar" style="background: var(--success-color);">系</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">系统消息</span>
+                            <span class="message-time">1天前</span>
+                        </div>
+                        <div class="message-text">
+                            欢迎加入百度贴吧！完成新手任务可获得奖励。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <div>首页</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">👥</div>
+                <div>贴吧</div>
+            </a>
+            <a href="#" class="nav-item active">
+                <div class="nav-icon">✉️</div>
+                <div>消息</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div>我的</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 个人中心页 -->
+    <div id="page-profile" class="page-content">
+        <div class="container">
+            <!-- 用户信息 -->
+            <div class="user-profile">
+                <div class="user-avatar">王</div>
+                <h2>王小明</h2>
+                <p style="color: var(--text-secondary); margin: var(--spacing-sm) 0;">贴吧等级：12级</p>
+                <button class="btn btn-secondary">编辑资料</button>
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">256</span>
+                        <span class="stat-label">关注</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">1.2k</span>
+                        <span class="stat-label">粉丝</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">89</span>
+                        <span class="stat-label">帖子</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 功能网格 -->
+            <div class="feature-grid">
+                <a href="#" class="feature-item">
+                    <div class="feature-icon">📝</div>
+                    <div>我的帖子</div>
+                </a>
+                <a href="#" class="feature-item">
+                    <div class="feature-icon">⭐</div>
+                    <div>我的收藏</div>
+                </a>
+                <a href="#" class="feature-item">
+                    <div class="feature-icon">👥</div>
+                    <div>我的贴吧</div>
+                </a>
+                <a href="#" class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <div>账号设置</div>
+                </a>
+                <a href="#" class="feature-item">
+                    <div class="feature-icon">🔔</div>
+                    <div>消息设置</div>
+                </a>
+                <a href="#" class="feature-item">
+                    <div class="feature-icon">❓</div>
+                    <div>帮助中心</div>
+                </a>
+            </div>
+
+            <!-- 最近活动 -->
+            <div class="card">
+                <div class="card-header">最近活动</div>
+                <div class="card-body">
+                    <div class="post-list">
+                        <div class="post-card">
+                            <div class="post-header">
+                                <div class="post-avatar">王</div>
+                                <div class="post-info">
+                                    <div class="post-title">新版本ADC英雄推荐</div>
+                                    <div class="post-meta">英雄联盟吧 · 2小时前</div>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                13.24版本哪些ADC比较强势？大家来讨论一下。
+                            </div>
+                        </div>
+
+                        <div class="post-card">
+                            <div class="post-header">
+                                <div class="post-avatar">王</div>
+                                <div class="post-info">
+                                    <div class="post-title">回复：美食制作心得</div>
+                                    <div class="post-meta">美食吧 · 1天前</div>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                这个方法很实用，我试过了效果不错！
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <div>首页</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">👥</div>
+                <div>贴吧</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">✉️</div>
+                <div>消息</div>
+            </a>
+            <a href="#" class="nav-item active">
+                <div class="nav-icon">👤</div>
+                <div>我的</div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 页面切换功能
+        function showPage(pageId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // 移除所有导航按钮的激活状态
+            document.querySelectorAll('.page-nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 显示目标页面
+            document.getElementById('page-' + pageId).classList.add('active');
+            
+            // 激活对应的导航按钮
+            event.target.classList.add('active');
+        }
+
+        // 底部导航切换功能
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 移除所有激活状态
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                
+                // 添加当前激活状态
+                this.classList.add('active');
+                
+                // 根据点击的导航项切换到对应页面
+                const navText = this.querySelector('div:last-child').textContent;
+                if (navText === '首页') showPage('home');
+                else if (navText === '贴吧') showPage('tieba');
+                else if (navText === '消息') showPage('message');
+                else if (navText === '我的') showPage('profile');
+            });
+        });
+
+        // 搜索功能
+        document.querySelector('.search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value.trim();
+                if (searchTerm) {
+                    alert('搜索: ' + searchTerm);
+                    // 实际项目中这里会跳转到搜索结果页
+                }
+            }
+        });
+
+        // 点赞功能
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.textContent.includes('👍')) {
+                    const currentCount = parseInt(this.textContent.match(/\d+/)[0]);
+                    this.textContent = this.textContent.replace(/\d+/, currentCount + 1);
+                }
+            });
+        });
+
+        // 响应式调整
+        function handleResize() {
+            const screenWidth = window.innerWidth;
+            const html = document.documentElement;
+            
+            if (screenWidth < 480) {
+                html.style.fontSize = '12px';
+            } else if (screenWidth < 768) {
+                html.style.fontSize = '14px';
+            } else {
+                html.style.fontSize = '16px';
+            }
+        }
+
+        // 初始化
+        window.addEventListener('resize', handleResize);
+        handleResize();
+
+        console.log('贴吧前端效果图加载完成！');
+    </script>
+</body>
+</html>#" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div>我的</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 贴吧详情页 -->
+    <div id="page-tieba" class="page-content">
+        <div class="container">
+            <!-- 贴吧头部信息 -->
+            <div class="user-profile">
+                <div class="tieba-avatar" style="width: 80px; height: 80px; margin-bottom: var(--spacing-md);">LOL</div>
+                <h2>英雄联盟吧</h2>
+                <p style="color: var(--text-secondary); margin: var(--spacing-sm) 0;">讨论英雄联盟游戏相关话题</p>
+                <button class="btn btn-primary">+ 关注</button>
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">120万</span>
+                        <span class="stat-label">成员</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">5千</span>
+                        <span class="stat-label">帖子</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">在线</span>
+                        <span class="stat-label">2.1万</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 贴吧导航 -->
+            <div class="card">
+                <div class="card-body" style="display: flex; gap: var(--spacing-md); overflow-x: auto;">
+                    <button class="btn btn-primary btn-sm">推荐</button>
+                    <button class="btn btn-secondary btn-sm">最新</button>
+                    <button class="btn btn-secondary btn-sm">精华</button>
+                    <button class="btn btn-secondary btn-sm">视频</button>
+                    <button class="btn btn-secondary btn-sm">图片</button>
+                </div>
+            </div>
+
+            <!-- 帖子列表 -->
+            <div class="post-list">
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-avatar">王</div>
+                        <div class="post-info">
+                            <div class="post-title">【置顶】吧规及常见问题解答</div>
+                            <div class="post-meta">吧务团队 · 3天前 · 1024回复</div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        欢迎来到英雄联盟吧！请仔细阅读吧规，共同维护良好的讨论环境。
+                    </div>
+                    <div class="post-actions">
+                        <div class="action-btn">👍 512</div>
+                        <div class="action-btn">💬 1024</div>
+                    </div>
+                </div>
+
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-avatar">赵</div>
+                        <div class="post-info">
+                            <div class="post-title">新版本ADC英雄推荐</div>
+                            <div class="post-meta">1小时前 · 56回复</div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        13.24版本哪些ADC比较强势？大家来讨论一下。
+                    </div>
+                    <div class="post-actions">
+                        <div class="action-btn">👍 28</div>
+                        <div class="action-btn">💬 56</div>
+                        <div class="action-btn">⭐ 收藏</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 发帖按钮 -->
+        <button class="btn btn-primary" style="position: fixed; bottom: 100px; right: 20px; border-radius: 50%; width: 60px; height: 60px;">+</button>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <div>首页</div>
+            </a>
+            <a href="#" class="nav-item active">
+                <div class="nav-icon">👥</div>
+                <div>贴吧</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">✉️</div>
+                <div>消息</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div>我的</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 帖子详情页 -->
+    <div id="page-post" class="page-content">
+        <div class="container">
+            <!-- 帖子头部 -->
+            <div class="card">
+                <div class="card-body">
+                    <h2 style="margin-bottom: var(--spacing-md);">新版本ADC英雄推荐</h2>
+                    <div class="post-header">
+                        <div class="post-avatar">赵</div>
+                        <div class="post-info">
+                            <div style="font-weight: 600;">赵小明</div>
+                            <div class="post-meta">英雄联盟吧 · 1小时前</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 帖子内容 -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="post-content" style="line-height: 1.8;">
+                        <p>13.24版本更新后，ADC位置发生了很大变化。经过几天测试，我觉得以下几个英雄表现不错：</p>
+                        
+                        <p><strong>1. 厄斐琉斯</strong></p>
+                        <p>新版本加强了前期能力，对线期更加稳定。</p>
+                        
+                        <p><strong>2. 卡莎</strong></p>
+                        <p>装备适应性很强，中期爆发高。</p>
+                        
+                        <p><strong>3. 烬</strong></p>
+                        <p>控制能力优秀，适合配合团队。</p>
+                        
+                        <p>大家有什么其他推荐吗？欢迎讨论！</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 互动功能 -->
+            <div class="card">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-around; align-items: center;">
+                        <div class="action-btn" style="font-size: 1rem;">
+                            <span style="font-size: 1.25rem;">👍</span> 28
+                        </div>
+                        <div class="action-btn" style="font-size: 1rem;">
+                            <span style="font-size: 1.25rem;">💬</span> 56
+                        </div>
+                        <div class="action-btn" style="font-size: 1rem;">
+                            <span style="font-size: 1.25rem;">⭐</span> 收藏
+                        </div>
+                        <div class="action-btn" style="font-size: 1rem;">
+                            <span style="font-size: 1.25rem;">↗</span> 分享
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 评论列表 -->
+            <div class="card">
+                <div class="card-header">评论 (56)</div>
+                <div class="card-body">
+                    <div class="message-list">
+                        <div class="message-item">
+                            <div class="message-avatar">钱</div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">钱多多</span>
+                                    <span class="message-time">45分钟前</span>
+                                </div>
+                                <div class="message-text">
+                                    我觉得EZ也不错，新装备很适合他。
+                                </div>
+                                <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-sm);">
+                                    <div class="action-btn btn-sm">👍 12</div>
+                                    <div class="action-btn btn-sm">回复</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="message-item">
+                            <div class="message-avatar">孙</div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">孙小美</span>
+                                    <span class="message-time">30分钟前</span>
+                                </div>
+                                <div class="message-text">
+                                    同意楼主的分析，卡莎确实很强。
+                                </div>
+                                <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-sm);">
+                                    <div class="action-btn btn-sm">👍 8</div>
+                                    <div class="action-btn btn-sm">回复</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <div>首页</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">👥</div>
+                <div>贴吧</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">✉️</div>
+                <div>消息</div>
+            </a>
+            <a href="
